@@ -5,13 +5,18 @@
 Participants threat-model an LLM application, probe a defended RAG system, and
 craft an indirect injection against the boundary between instructions and data.
 
+The RAG target ships as `rag_server.py`, which participants do not edit. They
+attack it only through its public API (`ask`, `add_document`) from their own
+answer file, and reconstruct its system prompt and defenses by probing rather
+than by reading the code.
+
 **Suggested time:** 75–90 minutes
 
 **Exercises:** [Open the participant instructions](section4_instructions.md)
 
 | Area | Prerequisites coming in | Main learnings going out |
 | --- | --- | --- |
-| Engineering | RAG and MCP architecture | Operate a small RAG application, modify its knowledge base, and run a controlled attack |
+| Engineering | RAG and MCP architecture | Operate a small RAG application through its public API, poison its knowledge base, and run a controlled attack |
 | ML | Context windows and prompt serialization | Explain why retrieved text and trusted instructions share a model context despite application-level delimiters |
 | Security | Sources, sinks, trust boundaries, and attacker-controlled input | Enumerate untrusted channels, perform black-box reconnaissance, and distinguish mitigations from complete prevention |
 | Theory | - | Explain why prompt injection is partly an architectural control problem rather than only a prompt-writing problem |
