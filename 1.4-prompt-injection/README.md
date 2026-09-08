@@ -5,10 +5,9 @@
 Participants threat-model an LLM application, probe a defended RAG system, and
 craft an indirect injection against the boundary between instructions and data.
 
-The RAG target ships as `rag_server.py`, which participants do not edit. They
-attack it only through its public API (`ask`, `add_document`) from their own
-answer file, and reconstruct its system prompt and defenses by probing rather
-than by reading the code.
+The target ships as `rag_server.py` and is not edited. Participants attack it
+through its public API (`ask`, `add_document`) from their own answer file, and
+reconstruct its system prompt and defenses by probing rather than by reading.
 
 **Suggested time:** 75–90 minutes
 
