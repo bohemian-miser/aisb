@@ -7,14 +7,14 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 from aisb_utils import report
-from rag_server import SMALL_MODEL, add_document, ask, list_documents, reset_knowledge_base
+from rag_server import add_document, ask, list_documents, reset_knowledge_base
 
 
 
 # Tests
 @report
 def test_targeted_attack_succeeds(solution: Callable[[], None]):
-    # requires: live model (OpenRouter API key); calls the bot with SMALL_MODEL
+    # requires: live model (OpenRouter API key)
     reset_knowledge_base()
     solution()
     answer = ask("How long do refunds take?")
@@ -26,9 +26,9 @@ def test_targeted_attack_succeeds(solution: Callable[[], None]):
 
 @report
 def test_attack_is_specific(solution: Callable[[], None]):
-    # requires: live model (OpenRouter API key); calls the bot with SMALL_MODEL
+    # requires: live model (OpenRouter API key)
     reset_knowledge_base()
     solution()
     shipping = ask("How long does shipping take?")
     assert "90" not in shipping, f"Attack leaked to shipping query: {shipping}"
-    print("  Attack is specific to refund queries; shipping unaffected!")
+    print("  Attack is specific to refund queries!")
