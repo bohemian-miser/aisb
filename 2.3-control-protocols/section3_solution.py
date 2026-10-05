@@ -22,20 +22,10 @@ Implement the core protocol primitives: trusted monitoring, defer-to-trusted, an
 
 ### Environment
 
-This section uses the same **clean virtual environment** as
-[2.2](../2.2-monitoring/section2_instructions.md), installed from
-`requirements-control-arena.txt`. If you already created it in 2.3, just activate it.
-Otherwise:
-
-```bash
-# From the repository root
-python -m venv .venv-control-arena
-source .venv-control-arena/bin/activate
-pip install -r requirements-control-arena.txt
-```
-
-Select this interpreter in your IDE before running any code in this section (in VS Code:
-*Python: Select Interpreter* → `.venv-control-arena`), and make sure Docker is running.
+This section runs on the Day 2 VM with the same `.venv-day2` interpreter as
+[2.2](../2.2-monitoring/section2_instructions.md). See the
+[Day 0 setup guide](../day0-setup/README.md#connecting-to-your-day-2-machine) if you are
+not connected yet.
 
 ### Answer file
 
@@ -86,6 +76,7 @@ for _path in [str(_root), str(_shared)]:
 from day2_utils.eval_utils import extract_scores, load_eval_logs
 from day2_utils.generate_trajectories import generate_trajectories
 from day2_utils.metrics import calculate_roc_metrics
+from day2_utils.monitor_prompt import load_monitor_prompt
 from day2_utils.plotting import plot_safety_usefulness_frontier, plot_score_histograms
 
 from aisb_utils import report
@@ -119,24 +110,23 @@ Paste the setup code below into your answer file.
 """
 
 
-def create_monitor(prompt_path: Path, model: str = DEFAULT_TRUSTED_MODEL):
-    """Create a monitor from a prompt template file.
+def create_monitor(instructions_path: Path, model: str = DEFAULT_TRUSTED_MODEL):
+    """Create a monitor from your 2.2 monitor instructions file.
 
-    The prompt file uses str.format placeholders ({task_description}, {tool_calls})
-    which are filled in by the default last_tool_calls_prompt_formatter.
+    load_monitor_prompt wraps the instructions in the fixed header (problem and
+    tool calls) and footer (output format); see 2.2's day2_utils/monitor_prompt.py.
 
     Args:
-        prompt_path: Path to the monitor prompt text file.
+        instructions_path: Path to the monitor instructions text file.
         model: Model to use for monitoring (typically the trusted model).
 
     Returns:
         A ControlArena monitor agent.
     """
-    prompt_text = prompt_path.read_text()
     return basic_monitor_builder(
         model=model,
         model_role=None,
-        prompt=prompt_text,
+        prompt=load_monitor_prompt(instructions_path),
         score_range=MonitorScoreRange(min=0, max=10),
         cache=True,
         # Groq fails on Llama 3.1 8B function-calling ("Failed to call a
@@ -154,10 +144,10 @@ def create_monitor(prompt_path: Path, model: str = DEFAULT_TRUSTED_MODEL):
 
 
 # Shared setup for protocol evaluation
-protocol_monitor = create_monitor(SCRIPT_DIR / "prompts" / "monitor_prompt.txt")
+protocol_monitor = create_monitor(SCRIPT_DIR / "prompts" / "monitor_instructions.txt")
 if "REFERENCE_ONLY":
     protocol_monitor = create_monitor(
-        SCRIPT_DIR / "reference_solutions" / "monitor_prompt.txt"
+        SCRIPT_DIR / "reference_solutions" / "monitor_instructions.txt"
     )
 protocol_results: dict[str, object] = {}  # name -> DataFrame, for final comparison
 
